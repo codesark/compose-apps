@@ -1,0 +1,28 @@
+services:
+  sonarqube:
+    image: sonarqube:lts-community
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./sonarqube/data:/opt/sonarqube/data
+      - ./sonarqube/extensions:/opt/sonarqube/data
+      - ./sonarqube/logs:/opt/sonarqube/logs
+    environment:
+      - SONAR_JDBC_URL:${SONAR_JDBC_URL}
+      - SONAR_JDBC_USERNAME:${SONAR_JDBC_USERNAME}
+      - SONAR_JDBC_PASSWORD:${SONAR_JDBC_PASSWORD}
+  sonarqube-db:
+    image: postgres:16.3-bookworm
+    restart: unless-stopped
+    volumes:
+      - ./sonarqube-db/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SONAR_JDBC_USERNAME}
+      - POSTGRES_PASSWORD=${SONAR_JDBC_PASSWORD}
+      - POSTGRES_DB=sonar
+
+networks:
+  default:
+    external: true
+    name: nginx
